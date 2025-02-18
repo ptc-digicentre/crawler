@@ -99,7 +99,7 @@ def save_to_gcs(ip_address: str) -> bool:
         </head>
         <body>
             <div class="container">
-                <h1>Hello World!</h1>
+                <h1>Hello Google Cloud!</h1>
                 <div class="info">IP Address: {ip_address}</div>
                 <div class="info">Timestamp: {timestamp}</div>
                 <div class="info">Timezone: Asia/Taipei</div>
@@ -121,8 +121,7 @@ def save_to_gcs(ip_address: str) -> bool:
 
 def main() -> None:
     """Main function to orchestrate IP scraping and storage."""
-    print("Hello World!")  # 控制台顯示
-    logger.info("Hello World!")  # 日誌記錄
+    logger.info("Hello Google Cloud!")  # 日誌記錄
     
     try:
         # 檢查環境變數
