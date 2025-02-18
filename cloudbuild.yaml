@@ -1,0 +1,35 @@
+steps:
+# Build the image
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'asia-east1-docker.pkg.dev/dgc-it-support/crawler/crawler-natip', '.']
+# Push the image to Artifact Registry
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'asia-east1-docker.pkg.dev/dgc-it-support/crawler/crawler-natip']
+# Deploy image to Cloud Run Jobs
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: gcloud
+  args:
+    - 'run'
+    - 'jobs'
+    - 'create'
+    - 'crawler-job'
+    - '--image'
+    - 'asia-east1-docker.pkg.dev/dgc-it-support/crawler/crawler-natip'
+    - '--region'
+    - 'asia-east1'
+    - '--tasks'
+    - '1'
+    - '--set-env-vars'
+    - 'BUCKET_NAME=crawler-2025-logs'
+    - '--network'
+    - 'darwin-vpc'
+    - '--subnet'
+    - 'to-tg3f'
+    - '--vpc-egress'
+    - 'all-traffic'
+images:
+- 'asia-east1-docker.pkg.dev/dgc-it-support/crawler/crawler-natip'
+options:
+  logging: CLOUD_LOGGING_ONLY
+serviceAccount: '1073256584991-compute@developer.gserviceaccount.com'
+
