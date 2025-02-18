@@ -58,10 +58,11 @@ def save_to_gcs(ip_address: str) -> bool:
         tz = pytz.timezone('Asia/Taipei')
         timestamp = datetime.now(tz).strftime("%Y%m%d_%H%M%S")
         
+        # 初始化 GCS 客戶端
         client = storage.Client()
         bucket = client.bucket(bucket_name)
         
-        # 创建HTML内容
+        # 創建 HTML 內容
         html_content = f"""
         <html>
         <head>
@@ -107,11 +108,11 @@ def save_to_gcs(ip_address: str) -> bool:
         </html>
         """
         
-        # 只保存HTML版本
-        html_blob = bucket.blob(f"ip_logs/ip_{timestamp}.html")
-        html_blob.upload_from_string(html_content, content_type='text/html')
+        # 保存 HTML 文件到 GCS
+        blob = bucket.blob(f"ip_logs/ip_{timestamp}.html")
+        blob.upload_from_string(html_content, content_type='text/html')
         
-        logger.info(f"Successfully saved IP data to GCS: {html_blob.name}")
+        logger.info(f"Successfully saved IP data to GCS: {blob.name}")
         return True
         
     except Exception as e:
@@ -120,15 +121,17 @@ def save_to_gcs(ip_address: str) -> bool:
 
 def main() -> None:
     """Main function to orchestrate IP scraping and storage."""
-    print("Hello World!")  # 控制台显示
-    logger.info("Hello World!")  # 日志记录
+    print("Hello World!")  # 控制台顯示
+    logger.info("Hello World!")  # 日誌記錄
     
     try:
-        # Check for required environment variable
+        # 檢查環境變數
+        bucket_name = os.environ.get('BUCKET_NAME')
         if not bucket_name:
             logger.error("BUCKET_NAME environment variable not set")
             return
         
+        # 獲取 IP 並儲存
         ip = scrape_whois()
         if ip:
             if save_to_gcs(ip):
