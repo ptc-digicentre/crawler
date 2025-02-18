@@ -32,4 +32,3 @@ images:
 options:
   logging: CLOUD_LOGGING_ONLY
 serviceAccount: '1073256584991-compute@developer.gserviceaccount.com'
-
