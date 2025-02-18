@@ -39,7 +39,7 @@ def scrape_whois() -> Optional[str]:
 
 def save_to_gcs(ip_address: str) -> bool:
     """
-    Save IP address to Google Cloud Storage with timestamp.
+    Save IP address to Google Cloud Storage with timestamp as HTML file.
     
     Args:
         ip_address (str): The IP address to save
@@ -60,17 +60,8 @@ def save_to_gcs(ip_address: str) -> bool:
         
         client = storage.Client()
         bucket = client.bucket(bucket_name)
-        blob = bucket.blob(f"ip_logs/ip_{timestamp}.txt")
         
-        # Format the content with additional metadata and Hello World
-        content = (
-            "Hello World!\n"  # 新增的問候語
-            f"IP Address: {ip_address}\n"
-            f"Timestamp: {timestamp}\n"
-            f"Timezone: Asia/Taipei"
-        )
-        
-        # 创建一个HTML版本的内容
+        # 创建HTML内容
         html_content = f"""
         <html>
         <head>
@@ -80,32 +71,47 @@ def save_to_gcs(ip_address: str) -> bool:
                     font-family: Arial, sans-serif;
                     margin: 20px;
                     padding: 20px;
+                    background-color: #f0f0f0;
+                }}
+                .container {{
+                    background-color: white;
+                    padding: 20px;
+                    border-radius: 8px;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                    max-width: 600px;
+                    margin: 0 auto;
                 }}
                 h1 {{
                     color: #333;
+                    text-align: center;
+                    margin-bottom: 30px;
                 }}
                 .info {{
                     margin: 10px 0;
+                    padding: 10px;
+                    border-bottom: 1px solid #eee;
+                }}
+                .info:last-child {{
+                    border-bottom: none;
                 }}
             </style>
         </head>
         <body>
-            <h1>Hello World!</h1>
-            <div class="info">IP Address: {ip_address}</div>
-            <div class="info">Timestamp: {timestamp}</div>
-            <div class="info">Timezone: Asia/Taipei</div>
+            <div class="container">
+                <h1>Hello World!</h1>
+                <div class="info">IP Address: {ip_address}</div>
+                <div class="info">Timestamp: {timestamp}</div>
+                <div class="info">Timezone: Asia/Taipei</div>
+            </div>
         </body>
         </html>
         """
         
-        # 保存文本版本
-        blob.upload_from_string(content)
-        
-        # 保存HTML版本
+        # 只保存HTML版本
         html_blob = bucket.blob(f"ip_logs/ip_{timestamp}.html")
         html_blob.upload_from_string(html_content, content_type='text/html')
         
-        logger.info(f"Successfully saved IP data to GCS: {blob.name}")
+        logger.info(f"Successfully saved IP data to GCS: {html_blob.name}")
         return True
         
     except Exception as e:
@@ -119,7 +125,7 @@ def main() -> None:
     
     try:
         # Check for required environment variable
-        if not os.environ.get('BUCKET_NAME'):
+        if not bucket_name:
             logger.error("BUCKET_NAME environment variable not set")
             return
         
