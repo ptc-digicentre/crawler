@@ -27,16 +27,6 @@ steps:
     - 'to-tg3f'
     - '--vpc-egress'
     - 'all-traffic'
-# Execute the job immediately after deployment
-- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-  entrypoint: gcloud
-  args:
-    - 'run'
-    - 'jobs'
-    - 'execute'
-    - 'crawler-job'
-    - '--region'
-    - 'asia-east1'
 images:
 - 'asia-east1-docker.pkg.dev/dgc-it-support/crawler/crawler-natip'
 options:
