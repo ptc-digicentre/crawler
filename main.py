@@ -62,14 +62,49 @@ def save_to_gcs(ip_address: str) -> bool:
         bucket = client.bucket(bucket_name)
         blob = bucket.blob(f"ip_logs/ip_{timestamp}.txt")
         
-        # Format the content with additional metadata
+        # Format the content with additional metadata and Hello World
         content = (
+            "Hello World!\n"  # 新增的問候語
             f"IP Address: {ip_address}\n"
             f"Timestamp: {timestamp}\n"
             f"Timezone: Asia/Taipei"
         )
         
+        # 创建一个HTML版本的内容
+        html_content = f"""
+        <html>
+        <head>
+            <title>IP Information</title>
+            <style>
+                body {{
+                    font-family: Arial, sans-serif;
+                    margin: 20px;
+                    padding: 20px;
+                }}
+                h1 {{
+                    color: #333;
+                }}
+                .info {{
+                    margin: 10px 0;
+                }}
+            </style>
+        </head>
+        <body>
+            <h1>Hello World!</h1>
+            <div class="info">IP Address: {ip_address}</div>
+            <div class="info">Timestamp: {timestamp}</div>
+            <div class="info">Timezone: Asia/Taipei</div>
+        </body>
+        </html>
+        """
+        
+        # 保存文本版本
         blob.upload_from_string(content)
+        
+        # 保存HTML版本
+        html_blob = bucket.blob(f"ip_logs/ip_{timestamp}.html")
+        html_blob.upload_from_string(html_content, content_type='text/html')
+        
         logger.info(f"Successfully saved IP data to GCS: {blob.name}")
         return True
         
@@ -79,8 +114,8 @@ def save_to_gcs(ip_address: str) -> bool:
 
 def main() -> None:
     """Main function to orchestrate IP scraping and storage."""
-    print("Hello World!")  # 新增的顯示
-    logger.info("Hello World!")  # 同時也加入日誌記錄
+    print("Hello World!")  # 控制台显示
+    logger.info("Hello World!")  # 日志记录
     
     try:
         # Check for required environment variable
